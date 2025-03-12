@@ -86,14 +86,25 @@
 
     <script src="Build/parking-puzzle.loader.js"></script>
     <script>
+        // Proporção original do jogo (ajuste conforme necessário)
+        const gameAspectRatio = 16 / 9;
+
         // Função para ajustar o canvas com letterbox
         function adjustCanvasSize() {
             const canvas = document.getElementById("unity-canvas");
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
+            const isFullscreen = document.fullscreenElement !== null;
 
-            // Proporção original do jogo (ajuste conforme necessário)
-            const gameAspectRatio = 16 / 9;
+            let windowWidth, windowHeight;
+
+            if (isFullscreen) {
+                // No modo de tela cheia, usamos a largura e altura da tela inteira
+                windowWidth = screen.width;
+                windowHeight = screen.height;
+            } else {
+                // Fora do modo de tela cheia, usamos a largura e altura da janela
+                windowWidth = window.innerWidth;
+                windowHeight = window.innerHeight;
+            }
 
             // Calcular a proporção da janela atual
             const windowAspectRatio = windowWidth / windowHeight;
@@ -146,6 +157,11 @@
 
             // Ajustar o tamanho sempre que a janela for redimensionada
             window.addEventListener("resize", adjustCanvasSize);
+
+            // Detectar mudanças no modo de tela cheia
+            document.addEventListener("fullscreenchange", () => {
+                adjustCanvasSize();
+            });
 
             // Tentar entrar em tela cheia automaticamente
             requestFullscreen();
