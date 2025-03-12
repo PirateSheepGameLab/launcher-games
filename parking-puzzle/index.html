@@ -33,21 +33,55 @@
             transform: translate(-50%, -50%);
         }
 
-        #fullscreen-button {
+        /* Estilo da barra de carregamento */
+        #loading-screen {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.7);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
+            font-family: Arial, sans-serif;
+            z-index: 10;
+        }
+
+        #loading-bar-container {
+            width: 60%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #loading-bar {
+            width: 0%;
+            height: 100%;
+            background: white;
+            transition: width 0.2s ease;
+        }
+
+        #loading-text {
+            margin-top: 10px;
+            font-size: 18px;
         }
     </style>
 </head>
 
 <body>
+    <!-- Barra de Carregamento -->
+    <div id="loading-screen">
+        <div id="loading-bar-container">
+            <div id="loading-bar"></div>
+        </div>
+        <div id="loading-text">Loading: 0%</div>
+    </div>
+
+    <!-- Canvas do Jogo -->
     <canvas id="unity-canvas" tabindex="-1"></canvas>
 
     <script src="Build/parking-puzzle.loader.js"></script>
@@ -95,7 +129,18 @@
             companyName: "Pirate Sheep Game Lab",
             productName: "Parking Puzzle",
             productVersion: "1.0.0",
+        }, (progress) => {
+            // Atualizar a barra de carregamento com base no progresso
+            const loadingBar = document.getElementById("loading-bar");
+            const loadingText = document.getElementById("loading-text");
+
+            loadingBar.style.width = `${progress * 100}%`;
+            loadingText.textContent = `Carregando: ${(progress * 100).toFixed(0)}%`;
         }).then(() => {
+            // Ocultar a barra de carregamento após o carregamento completo
+            const loadingScreen = document.getElementById("loading-screen");
+            loadingScreen.style.display = "none";
+
             // Ajustar o tamanho inicial do canvas
             adjustCanvasSize();
 
@@ -104,10 +149,22 @@
 
             // Tentar entrar em tela cheia automaticamente
             requestFullscreen();
+        }).catch((error) => {
+            // Exibir erros, se houver
+            console.error(error);
         });
 
-        function closeGame() {
-            window.close();
+        function requestFullscreen() {
+            const canvas = document.getElementById("unity-canvas");
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.mozRequestFullScreen) {
+                canvas.mozRequestFullScreen();
+            } else if (canvas.webkitRequestFullscreen) {
+                canvas.webkitRequestFullscreen();
+            } else if (canvas.msRequestFullscreen) {
+                canvas.msRequestFullscreen();
+            }
         }
     </script>
 </body>
